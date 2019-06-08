@@ -17,4 +17,4 @@ Para ejecutar la app, debido a la carga de archivos es necesario crear la carpet
 
 No se require bajar ninguna libreria extra, debido a que el proyecto usa Maven, las dependencias registradas son descargadas en tiempo de compilacion.
 
-Al dia de hoy -NO INCLUYE- la libreria de Standord NLP
+Al dia de hoy -NO INCLUYE- la libreria de Stanford NLP
