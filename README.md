@@ -26,11 +26,11 @@ Al dia de hoy -NO INCLUYE- la libreria de Stanford NLP
 Deben tener instalado IntelliJ
 Deben tener instalado el motor de Git.
 
-1.- Abrir IntelliJ
-2.- En la pantalla de inicio, elijan "Configure" en la parte inferior derecha.
-3.- Seleccionen la opcion "Settings"
-4.- Expandan la seccion "Version Control", elijan "Git"
-5.- Den clic al boton test en la parte superior derecha, si funciona, es todo.
+1. Abrir IntelliJ
+2. En la pantalla de inicio, elijan "Configure" en la parte inferior derecha.
+3. Seleccionen la opcion "Settings"
+4. Expandan la seccion "Version Control", elijan "Git"
+5. Den clic al boton test en la parte superior derecha, si funciona, es todo.
     Si marca error, deben ubicar el ejecutable de Git a mano. La ruta por default deberia ser "C:\Program Files\Git\bin\git.exe"
     Repitan la prueba. Si funciona, es todo; ya pueden usar IntelliJ para descargar el proyecto.
 
@@ -38,6 +38,6 @@ Deben tener instalado el motor de Git.
 Deben tener instalado al menos el JDK 8
 Deben haber configurado Git como sistema de control de Versiones en IntelliJ
 
-1.- Descarguen todos los archivos del repositorio
-2.- En IntelliJ le dan "Check Out from Version Control". Seleccionan "Git"
-3.- Ponen la siguiente URL "https://github.com/JoaquinCarmona/generador_objetivos.git" y lo mapean a una carpeta en su Computadora.
+1. Descarguen todos los archivos del repositorio
+2. En IntelliJ le dan "Check Out from Version Control". Seleccionan "Git"
+3. Ponen la siguiente URL "https://github.com/JoaquinCarmona/generador_objetivos.git" y lo mapean a una carpeta en su Computadora.
