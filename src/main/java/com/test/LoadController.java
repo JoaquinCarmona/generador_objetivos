@@ -1,20 +1,16 @@
 package com.test;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.apache.pdfbox.tools.PDFText2HTML;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.relation.Role;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // para cargar como pagina de inicio
 //@RequestMapping("")
@@ -77,6 +73,25 @@ public class LoadController {
         return "load";
     }
 
+    // si se devuelve un objeto, agregar "produces = {MediaType.APPLICATION_JSON_VALUE}" al PostMapping
+    @PostMapping(value = "/generateObjective")
+    @ResponseBody
+    public GenerateObjectiveResponse generateObjective(@RequestBody GenerateObjectiveRequest request){
+
+        // acceder a los valores por medio de los getter y setters de la clase
+        String[] roles = request.getRoles();
+        String activity = request.getActivity();
+
+        String generatedObjective = nlpHandler.generateObjective(roles, activity);
+
+        // devuelve el objetivo generado
+        GenerateObjectiveResponse  response= new GenerateObjectiveResponse();
+        response.setMessage("Objetivo Generado...");
+        response.setObjective( generatedObjective);
+
+        return response;
+    }
+
     private String noAccents(String inText){
         String outText = "";
 
@@ -119,6 +134,8 @@ public class LoadController {
 
         StringBuilder strBuilder = new StringBuilder();
         int offset = 0;
+        Pattern pttrn = Pattern.compile("A[\\d+.]+");
+        Matcher matcher = pttrn.matcher(inText);
 
         while(offset <= inText.length()) {
             String innerText = "";
@@ -126,10 +143,16 @@ public class LoadController {
             String strBase = "";
 
             int startInd = inText.indexOf("<p>", offset);
-            int endInd = inText.indexOf(endStr, offset);
+            // se obtiene el indice para la siguiente actividad (las actividades empiezan con "A##.##."
+            int startIndNextAct = matcher.find() ? matcher.start() : -1;
+
+            String innerString = ( startIndNextAct != -1 ? inText.substring(offset, startIndNextAct) : inText.substring(offset));
+
+            int endInd = offset + innerString.lastIndexOf(endStr);
             if (startInd != -1 && endInd != -1){
                 //se obtiene el contenido de texto eliminando saltos y espacios en blanco al inicio y final
-                innerText = inText.substring(startInd + 3 , endInd - 1).replace("\r","").replace("\n","").trim();
+                //al igual que las etiquetas inyectadas por el lector PDF
+                innerText = inText.substring(startInd + 3 , endInd - 1).replace("\r", "").replace("\n", "").replace("<p>", "").replace("</p>", "").trim();
 
                 if (innerText.equals("Actividades")){
                     tags = "<div class=\"tableTitle col-md-12\">" + innerText + "</div>";
@@ -161,15 +184,20 @@ public class LoadController {
 
         String strRolesInTxt = "";
         for ( String role : roles ) {
-            if(inText.contains(role + " ")) {
+            if(inText.contains(role + " ") ) {
                 strRolesInTxt += role + "<br />";
                 inText = inText.replace(role + " ", "");
+            } else if (inText.contains(" " + role)){
+                strRolesInTxt += role + "<br />";
+                inText = inText.replace(" " + role, "");
             }
         }
 
-        String cellRoles = String.format(strBase,"cellRol col-md-2", strRolesInTxt);
-        String cellActivity = String.format(strBase,"cellActivity col-md-9", inText);
+        String cellRoles = String.format(strBase,"cellRol col-md-2", strRolesInTxt.trim());
+        String cellActivity = String.format(strBase,"cellActivity col-md-9", inText.trim());
+        String cellAction = String.format(strBase,"cellAction col-md-1", "<button id=\"btnFA\" class=\"btn btn-primary\"><i class=\"fa fa-cog fa-2x\"></i></button>");
 
-        return String.format("<div class=\"rowActivity col-md-12\">%1$s</div>", cellRoles + cellActivity);
+        return String.format("<div class=\"rowActivity col-md-12\">%1$s</div>", cellRoles + cellActivity + cellAction);
     }
+
 }
