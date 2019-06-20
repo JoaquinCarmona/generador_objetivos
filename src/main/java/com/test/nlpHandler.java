@@ -39,19 +39,64 @@ public class nlpHandler {
 
         StringBuilder strBuilder = new StringBuilder();
 
+        boolean firstWord = true;
+        boolean changeVerb = true;
+
         List<CoreMap> sentences = document.get(SentencesAnnotation.class);
         for(CoreMap sentence : sentences){
             for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
                 String word = token.get(TextAnnotation.class);
-                String pos = token.get(PartOfSpeechAnnotation.class);
 
-                strBuilder.append(String.format("[ %1$s, %2$s] ",word, pos));
+                if(firstWord) {
+                    // Se cambia la "A" por "O" para identificarlo como un objetivo
+                    strBuilder.append(word.replace("A", "O"));
+                    firstWord = false;
+                } else {
+                    String pos = token.get(PartOfSpeechAnnotation.class);
+
+                    if(pos.equals("vmn0000") && changeVerb){
+                        // TODO: Agregar lista de roles solo una vez??
+                        strBuilder.append(getNoun(roles));
+                        strBuilder.append(" " + word.toLowerCase() + (roles.length > 1 ? "án" : "á"));
+
+                    } else {
+                        if (!pos.equals("cc") && !pos.equals("fc") && !pos.equals("fp"))
+                            changeVerb = false;
+                        else
+                            changeVerb = true;
+
+                        // para regresar los parentesis a su representacion normal
+                        if (word.equals("=LRB="))
+                            word = "(";
+                        if (word.equals("=RRB="))
+                            word = ")";
+
+                        // comas y puntos no llevan espacio precedente
+                        strBuilder.append(((!pos.equals("fc") && !pos.equals("fp") ? " " : "") + word));
+                    }
+                }
             }
         }
 
-        //TODO: Crear respuesta
         String objective = strBuilder.toString();
 
         return objective;
+    }
+
+    protected static String getNoun(String[] roles){
+        StringBuilder strBldr = new StringBuilder();
+
+        for ( int i = 0; i <= roles.length - 1; i++) {
+            if( i == 0){
+                strBldr.append(String.format(" Él %1$s", roles[i]));
+            } else {
+                if (i == roles.length - 1)
+                    strBldr.append(String.format(" y %1$s", roles[i]));
+                else
+                    strBldr.append(String.format(", %1$s", roles[i]));
+            }
+        }
+
+        return strBldr.toString();
     }
 }

@@ -130,10 +130,8 @@
 
     <!-- Para habilitar Jquery UI -->
     <script src="webjars/jquery-ui/1.11.1/jquery-ui.min.js"></script>
-    <script src="webjars/jquery-ui/1.11.1/webjars-requirejs.js"></script>
 
     <script>
-        var pageBlocker;
         $(document).ready(function(){
             $(".tablecell .btn-primary").on("click", generateObjective);
 
@@ -142,6 +140,7 @@
                 autoOpen: false,
                 modal: true,
                 resizable: false,
+                width: 200,
                 closeOnEscape: false
             });
 
@@ -155,7 +154,7 @@
                     }
                 },
                 resizable: false,
-                width: 500,
+                width: 600,
                 closeOnEscape: false
             });
         });
